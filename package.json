@@ -1,0 +1,26 @@
+{
+  "name": "js-hw35",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "browserslist": "> 0.5%, last 2 versions, not dead",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx parcel src/index.html",
+    "build": "parcel build src/index.html --public-url //",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@pnotify/core": "^5.2.0",
+    "parcel": "^2.16.4",
+    "pnotify": "^5.2.0"
+  },
+  "dependencies": {
+    "gh-pages": "^6.3.0",
+    "lodash.debounce": "^4.0.8"
+  }
+}
