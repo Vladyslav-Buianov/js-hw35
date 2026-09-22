@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx parcel src/index.html",
-    "build": "parcel build src/index.html --public-url //",
+    "build": "parcel build src/index.html --public-url /js-hw35/",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
