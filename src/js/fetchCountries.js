@@ -1,49 +1,23 @@
-const API_URL = "https://raw.githubusercontent.com/mledoze/countries/master/dist/countries.json";
-let cachedCountries = null;
+const API_URL = "https://api.restcountries.com/countries/v5";
+const API_KEY = "rc_live_15b2a069e2584476abba6f4a3ae8b5bb";
 
-export default function fetchCountries(searchQuery) {
-  const query = searchQuery.trim().toLowerCase();
-  if (!query) {
-    return Promise.resolve([]);
-  }
-  const dataPromise = cachedCountries
-    ? Promise.resolve(cachedCountries)
-    : fetch(API_URL)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`Errore HTTP: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((data) => {
-          cachedCountries = data;
-          return data;
-        });
-  return dataPromise.then((countries) => {
-    const filtered = countries.filter((c) =>
-      c.name.common.toLowerCase().includes(query),
-    );
-    return filtered.map((c) => {
-      const realPopulation =
-        c.population ||
-        c.pop ||
-        (c.demographics && c.demographics.population) ||
-        59554023;
-      return {
-        name: { common: c.name.common },
-        capital:
-          Array.isArray(c.capital) && c.capital.length > 0
-            ? c.capital
-            : ["N/A"],
-        population: realPopulation,
-        languages: c.languages || {},
-        flags: {
-          svg: c.cca2 ? `https://flagcdn.com/${c.cca2.toLowerCase()}.svg` : "",
-          png: c.cca2
-            ? `https://flagcdn.com/w320/${c.cca2.toLowerCase()}.png`
-            : "",
-        },
-      };
+export default function fetchCountries(country) {
+  return fetch(`${API_URL}?q=${country}`, {
+    headers: {
+      Authorization: `Bearer ${API_KEY}`,
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        if (response.status === 404) return [];
+        throw new Error("Server error: " + response.status);
+      }
+      return response.json();
+    })
+    .then((res) => {
+      if (res?.data?.objects && Array.isArray(res.data.objects)) {
+        return res.data.objects;
+      }
+      return [];
     });
-  });
 }

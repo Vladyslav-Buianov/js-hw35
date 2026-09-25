@@ -37,47 +37,57 @@ body {
   border-color: #007bff;
 }
 
-.country-container {
-  margin-top: 20px;
-}
-
-.country-list {
-  list-style: disc;
-  padding-left: 24px;
-  margin: 0;
-}
-
-.country-list-item {
-  font-size: 16px;
-  padding: 4px 0;
-}
-
 .country-card {
-  border-top: 1px solid #eee;
-  padding-top: 16px;
+  max-width: 600px;
+  margin-top: 20px;
+  font-family: sans-serif;
 }
 
-.country-name {
-  margin-top: 0;
-  font-size: 24px;
-  color: #2c3e50;
+.country-title {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  font-weight: bold;
 }
 
-.country-info-wrapper {
+.country-content {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 20px;
+  gap: 40px;
+}
+
+.country-details {
+  font-size: 1.1rem;
+  line-height: 1.5;
 }
 
 .country-details p {
-  margin: 8px 0;
-  font-size: 15px;
+  margin: 12px 0;
+}
+
+.languages-list {
+  margin-top: 8px;
+  padding-left: 25px;
+}
+
+.languages-list li {
+  margin-bottom: 4px;
+}
+
+.country-flag-wrapper {
+  flex-shrink: 0;
 }
 
 .country-flag {
-  width: 160px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  width: 260px;
+  height: auto;
+  display: block;
+}
+
+.country-list {
+  margin-top: 20px;
+  padding-left: 25px;
+  font-size: 1.2rem;
+  line-height: 1.8;
 }
