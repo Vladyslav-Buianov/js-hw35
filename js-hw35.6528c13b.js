@@ -724,63 +724,81 @@ var _fetchCountriesJs = require("./fetchCountries.js");
 var _fetchCountriesJsDefault = parcelHelpers.interopDefault(_fetchCountriesJs);
 const searchInput = document.querySelector("#country-input");
 const countryContainer = document.querySelector("#country-container");
-searchInput.addEventListener("input", (0, _lodashDebounceDefault.default)(onSearchInput, 500));
-function onSearchInput(event) {
-    const searchQuery = event.target.value.trim();
+const noticeStack = new (0, _core.Stack)({
+    dir1: "down",
+    firstpos1: 25,
+    modal: false,
+    maxOpen: 1
+});
+if (searchInput) searchInput.addEventListener("input", (0, _lodashDebounceDefault.default)(onSearchInput, 500));
+function onSearchInput() {
+    const searchQuery = searchInput.value.trim();
     clearCountryContainer();
+    noticeStack.close();
     if (!searchQuery) return;
     (0, _fetchCountriesJsDefault.default)(searchQuery).then(handleCountryResult).catch((err)=>{
         console.error("Fetch error:", err);
         (0, _core.error)({
             text: "Error loading data.",
-            delay: 3000
+            delay: 3000,
+            stack: noticeStack
         });
     });
 }
 function handleCountryResult(countries) {
     if (!countries || countries.length === 0) (0, _core.error)({
         text: "Country not found! Check your input.",
-        delay: 3000
+        delay: 3000,
+        stack: noticeStack
     });
     else if (countries.length > 10) (0, _core.alert)({
         text: "Too many matches found. Please enter a more specific query!",
-        delay: 3000
+        delay: 3000,
+        stack: noticeStack
     });
     else if (countries.length >= 2 && countries.length <= 10) renderCountryList(countries);
     else if (countries.length === 1) renderCountryCard(countries[0]);
 }
+function getCountryName(c) {
+    return c.names?.common || c.names?.official || "Unknown";
+}
 function renderCountryList(countries) {
     const listMarkup = `
-<ul class="country-list">
-${countries.map((c)=>`<li class="country-list-item">${c.name.common}</li>`).join("")}
-</ul>
-`;
+    <ul class="country-list">
+      ${countries.map((c)=>`<li class="country-list-item">${getCountryName(c)}</li>`).join("")}
+    </ul>
+  `;
     countryContainer.innerHTML = listMarkup;
 }
 function renderCountryCard(country) {
-    const name = country.name.common;
-    const capital = country.capital ? country.capital.join(", ") : "Unknown";
-    const population = country.population ? country.population.toLocaleString("en-US") : "0";
-    const languages = country.languages ? Object.values(country.languages).join(", ") : "Unknown";
-    const flag = country.flags ? country.flags.svg || country.flags.png : "";
-    const cardMarkup = ` 
-<div class="country-card"> 
-<h2 class="country-name">${name}</h2> 
-<div class="country-info-wrapper"> 
-<div class="country-details"> 
-<p><b>Capital:</b> ${capital}</p> 
-<p><b>Population:</b> ${population}</p> 
-<p><b>Languages:</b></p> 
-<ul> 
-${country.languages ? Object.values(country.languages).map((lang)=>`<li>${lang}</li>`).join("") : ""} 
-</ul> 
-</div> 
-<div class="country-flag-wrapper"> 
-<img src="${flag}" alt="Flag of ${name}" class="country-flag" width="200" /> 
-</div> 
-</div> 
-</div> 
-`;
+    const name = getCountryName(country);
+    let capital = "Unknown";
+    if (Array.isArray(country.capitals) && country.capitals.length > 0) capital = country.capitals.map((cap)=>typeof cap === "object" ? cap.name || cap.common : cap).filter(Boolean).join(", ");
+    const population = country.population ? country.population.toLocaleString() : "0";
+    let languagesList = "";
+    if (Array.isArray(country.languages)) languagesList = country.languages.map((l)=>{
+        const langName = typeof l === "object" ? l.name || l.common || Object.values(l)[0] : l;
+        return `<li>${langName}</li>`;
+    }).join("");
+    const flagUrl = country.flag?.svg || country.flag?.png || country.flags?.svg || country.flags?.png || (typeof country.flag === "string" && country.flag.startsWith("http") ? country.flag : null) || (country.codes?.alpha_2 ? `https://flagcdn.com/w320/${country.codes.alpha_2.toLowerCase()}.png` : null);
+    const cardMarkup = `
+    <div class="country-card">
+      <h1 class="country-title">${name}</h1>
+      <div class="country-content">
+        <div class="country-details">
+          <p><b>Capital:</b> ${capital}</p>
+          <p><b>Population:</b> ${population}</p>
+          <p><b>Languages:</b></p>
+          <ul class="languages-list">
+            ${languagesList}
+          </ul>
+        </div>
+        <div class="country-flag-wrapper">
+          ${flagUrl ? `<img src="${flagUrl}" alt="Flag of ${name}" class="country-flag" width="250" />` : `<span class="country-code" style="font-size: 48px; font-weight: bold;">${country.codes?.alpha_2 || "CH"}</span>`}
+        </div>
+      </div>
+    </div>
+  `;
     countryContainer.innerHTML = cardMarkup;
 }
 function clearCountryContainer() {
@@ -3700,37 +3718,22 @@ var global = arguments[3];
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "default", ()=>fetchCountries);
-const API_URL = "https://raw.githubusercontent.com/mledoze/countries/master/dist/countries.json";
-let cachedCountries = null;
-function fetchCountries(searchQuery) {
-    const query = searchQuery.trim().toLowerCase();
-    if (!query) return Promise.resolve([]);
-    const dataPromise = cachedCountries ? Promise.resolve(cachedCountries) : fetch(API_URL).then((response)=>{
-        if (!response.ok) throw new Error(`Errore HTTP: ${response.status}`);
+const API_URL = "https://api.restcountries.com/countries/v5";
+const API_KEY = "rc_live_15b2a069e2584476abba6f4a3ae8b5bb";
+function fetchCountries(country) {
+    return fetch(`${API_URL}?q=${country}`, {
+        headers: {
+            Authorization: `Bearer ${API_KEY}`
+        }
+    }).then((response)=>{
+        if (!response.ok) {
+            if (response.status === 404) return [];
+            throw new Error("Server error: " + response.status);
+        }
         return response.json();
-    }).then((data)=>{
-        cachedCountries = data;
-        return data;
-    });
-    return dataPromise.then((countries)=>{
-        const filtered = countries.filter((c)=>c.name.common.toLowerCase().includes(query));
-        return filtered.map((c)=>{
-            const realPopulation = c.population || c.pop || c.demographics && c.demographics.population || 59554023;
-            return {
-                name: {
-                    common: c.name.common
-                },
-                capital: Array.isArray(c.capital) && c.capital.length > 0 ? c.capital : [
-                    "N/A"
-                ],
-                population: realPopulation,
-                languages: c.languages || {},
-                flags: {
-                    svg: c.cca2 ? `https://flagcdn.com/${c.cca2.toLowerCase()}.svg` : "",
-                    png: c.cca2 ? `https://flagcdn.com/w320/${c.cca2.toLowerCase()}.png` : ""
-                }
-            };
-        });
+    }).then((res)=>{
+        if (res?.data?.objects && Array.isArray(res.data.objects)) return res.data.objects;
+        return [];
     });
 }
 
