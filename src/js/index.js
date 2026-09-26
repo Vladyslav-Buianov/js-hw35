@@ -96,14 +96,7 @@ function renderCountryCard(country) {
       })
       .join("");
   }
-  const flagUrl =
-    country.flag?.svg ||
-    country.flag?.png ||
-    country.flags?.svg ||
-    country.flags?.png ||
-    (typeof country.flag === "string" && country.flag.startsWith("http") ? country.flag : null) ||
-    (country.codes?.alpha_2 ? `https://flagcdn.com/w320/${country.codes.alpha_2.toLowerCase()}.png` : null);
-
+  const flagUrl = country.flag.url_png;
   const cardMarkup = `
     <div class="country-card">
       <h1 class="country-title">${name}</h1>
