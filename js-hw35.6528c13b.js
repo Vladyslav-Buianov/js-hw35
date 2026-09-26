@@ -725,8 +725,10 @@ var _fetchCountriesJsDefault = parcelHelpers.interopDefault(_fetchCountriesJs);
 const searchInput = document.querySelector("#country-input");
 const countryContainer = document.querySelector("#country-container");
 const noticeStack = new (0, _core.Stack)({
-    dir1: "down",
-    firstpos1: 25,
+    dir1: 'down',
+    dir2: 'left',
+    firstpos1: 10,
+    firstpos2: 10,
     modal: false,
     maxOpen: 1
 });
@@ -740,7 +742,7 @@ function onSearchInput() {
         console.error("Fetch error:", err);
         (0, _core.error)({
             text: "Error loading data.",
-            delay: 3000,
+            delay: 1200,
             stack: noticeStack
         });
     });
