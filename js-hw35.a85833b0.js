@@ -2,7 +2,7 @@ var t,e="u">typeof globalThis?globalThis:"u">typeof self?self:"u">typeof window?
     <ul class="country-list">
       ${e.map(t=>`<li class="country-list-item">${x(t)}</li>`).join("")}
     </ul>
-  `):1===t.length&&(i=x(n=t[0]),o="Unknown",Array.isArray(n.capitals)&&n.capitals.length>0&&(o=n.capitals.map(t=>"object"==typeof t?t.name||t.common:t).filter(Boolean).join(", ")),r=n.population?n.population.toLocaleString():"0",s="",Array.isArray(n.languages)&&(s=n.languages.map(t=>{let e="object"==typeof t?t.name||t.common||Object.values(t)[0]:t;return`<li>${e}</li>`}).join("")),a=n.flag?.svg||n.flag?.png||n.flags?.svg||n.flags?.png||("string"==typeof n.flag&&n.flag.startsWith("http")?n.flag:null)||(n.codes?.alpha_2?`https://flagcdn.com/w320/${n.codes.alpha_2.toLowerCase()}.png`:null),$.innerHTML=`
+  `):1===t.length&&(i=x(n=t[0]),o="Unknown",Array.isArray(n.capitals)&&n.capitals.length>0&&(o=n.capitals.map(t=>"object"==typeof t?t.name||t.common:t).filter(Boolean).join(", ")),r=n.population?n.population.toLocaleString():"0",s="",Array.isArray(n.languages)&&(s=n.languages.map(t=>{let e="object"==typeof t?t.name||t.common||Object.values(t)[0]:t;return`<li>${e}</li>`}).join("")),a=n.flag.url_png,$.innerHTML=`
     <div class="country-card">
       <h1 class="country-title">${i}</h1>
       <div class="country-content">
@@ -20,4 +20,4 @@ var t,e="u">typeof globalThis?globalThis:"u">typeof self?self:"u">typeof window?
       </div>
     </div>
   `):(0,y.error)({text:"Country not found! Check your input.",delay:3e3,stack:_})}function x(t){return t.names?.common||t.names?.official||"Unknown"}g&&g.addEventListener("input",((t=n)&&t.__esModule?t.default:t)(function(){let t=g.value.trim();($.innerHTML="",_.close(),t)&&fetch(`https://api.restcountries.com/countries/v5?q=${t}`,{headers:{Authorization:"Bearer rc_live_15b2a069e2584476abba6f4a3ae8b5bb"}}).then(t=>{if(!t.ok){if(404===t.status)return[];throw Error("Server error: "+t.status)}return t.json()}).then(t=>t?.data?.objects&&Array.isArray(t.data.objects)?t.data.objects:[]).then(k).catch(t=>{console.error("Fetch error:",t),(0,y.error)({text:"Error loading data.",delay:3e3,stack:_})})},500));
-//# sourceMappingURL=js-hw35.bf0c6c36.js.map
+//# sourceMappingURL=js-hw35.a85833b0.js.map
