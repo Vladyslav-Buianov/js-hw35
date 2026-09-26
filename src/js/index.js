@@ -8,8 +8,10 @@ const searchInput = document.querySelector("#country-input");
 const countryContainer = document.querySelector("#country-container");
 
 const noticeStack = new Stack({
-  dir1: "down",
-  firstpos1: 25,
+  dir1: 'down',
+  dir2: 'left',
+  firstpos1: 10,
+  firstpos2: 10,
   modal: false,
   maxOpen: 1,
 });
