@@ -34,7 +34,7 @@ function onSearchInput() {
       console.error("Fetch error:", err);
       error({
         text: "Error loading data.",
-        delay: 3000,
+        delay: 1200,
         stack: noticeStack,
       });
     });
